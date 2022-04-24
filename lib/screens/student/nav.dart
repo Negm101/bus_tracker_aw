@@ -35,7 +35,7 @@ class _NavPageState extends State<NavPage> {
         leading: Align(
           alignment: Alignment.center,
           child: Text(
-            ' \u{1F44B} ',
+            '\u{1F44B} ',
             style: const TextStyle(color: Colors.grey, fontSize: 21),
             textAlign: TextAlign.center,
           ),

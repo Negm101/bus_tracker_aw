@@ -155,8 +155,8 @@ class _MapDriverPageState extends State<MapDriverPage> {
                                 pointer = LatLng(locationData.latitude!,
                                     locationData.longitude!);
                                 Future result = database.updateDocument(
-                                    collectionId: "6202ad43b4091862b744",
-                                    documentId: "620fe71946cc2b5136fe",
+                                    collectionId: "buss",
+                                    documentId: "6248c8ae48ba62e18a94",
                                     data: {
                                       "latitude": locationData.latitude!,
                                       "longitude": locationData.longitude!,
@@ -198,11 +198,12 @@ class _MapDriverPageState extends State<MapDriverPage> {
                             // Realtime
                             _realtime = Realtime(CurrentSession.client);
                             _subscription = _realtime!
-                                .subscribe(['documents.620fe71946cc2b5136fe']);
+                                .subscribe(['collections.buss.documents.6248c8ae48ba62e18a94']);
                             _subscription?.stream.listen((response) {
                               _locationReal =
                                   LocationReal.fromJson(response.payload);
-                              pointer = LatLng(_locationReal!.latitude!, _locationReal!.longitude!);
+                              pointer = LatLng(_locationReal!.latitude!,
+                                  _locationReal!.longitude!);
                             });
                           },
                           onLongPress: () {

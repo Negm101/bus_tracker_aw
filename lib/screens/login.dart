@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import '../general.dart';
 
 class LoginPage extends StatelessWidget {
-  static const String endpoint = "http://159.223.34.67/v1";
-  static const String projectId = "6202ad38a174a3dad798";
+  static const String endpoint = "http://192.168.1.100:90/v1";
+  static const String projectId = "mmuBusTracker";
 
   final TextEditingController emailController =
       TextEditingController(text: "omar@gmail.com");

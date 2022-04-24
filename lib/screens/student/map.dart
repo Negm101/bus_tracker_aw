@@ -59,7 +59,7 @@ class _MapPageState extends State<MapPage> {
     DocumentList _docList;
     _database = Database(CurrentSession.client);
     Future result = _database.listDocuments(
-      collectionId: '6202ad43b4091862b744',
+      collectionId: 'buss',
     );
 
     result.then((response) {
@@ -71,11 +71,10 @@ class _MapPageState extends State<MapPage> {
     });
 
     _mapController = MapController();
-    statefulMapController =
-        StatefulMapController(mapController: _mapController);
-    statefulMapController?.onReady.then((_) => loadData());
-    statefulMapController?.changeFeed.listen((change) => setState(() {}));
-    print(statefulMapController?.lines.toString());
+    //statefulMapController = StatefulMapController(mapController: _mapController);
+    //statefulMapController?.onReady.then((_) => loadData());
+    //statefulMapController?.changeFeed.listen((change) => setState(() {}));
+    //print(statefulMapController?.lines.toString());
     super.initState();
   }
 
@@ -192,12 +191,14 @@ class _MapPageState extends State<MapPage> {
 
   void subToBus() {
     _realtime = Realtime(CurrentSession.client);
-    _subscription = _realtime!.subscribe(['documents.${_selectedBus!.id}']);
+    _subscription = _realtime!.subscribe(['collections.buss.documents.${_selectedBus!.id}']);
     _subscription?.stream.listen((response) {
       _locationReal = LocationReal.fromJson(response.payload);
       _busLocation =
           LatLng(_locationReal!.latitude!, _locationReal!.longitude!);
+      print("location: " + _busLocation.toString());
     });
+    print("selected bus id" + _selectedBus!.id.toString());
   }
 
   void initLocServ() async {

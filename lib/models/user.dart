@@ -13,7 +13,6 @@ String busToJson(Bus data) => json.encode(data.toJson());
 
 class Bus {
   Bus({
-    this.driverName,
     this.plateNumber,
     this.latitude,
     this.longitude,
@@ -25,7 +24,6 @@ class Bus {
     this.collection,
   });
 
-  String? driverName;
   String? plateNumber;
   double? latitude;
   double? longitude;
@@ -37,7 +35,6 @@ class Bus {
   String? collection;
 
   factory Bus.fromJson(Map<String, dynamic> json) => Bus(
-        driverName: json["driverName"],
         plateNumber: json["plateNumber"],
         latitude: json["latitude"].toDouble(),
         longitude: json["longitude"].toDouble(),
@@ -50,7 +47,6 @@ class Bus {
       );
 
   Map<String, dynamic> toJson() => {
-        "driverName": driverName,
         "plateNumber": plateNumber,
         "latitude": latitude,
         "longitude": longitude,
