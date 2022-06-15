@@ -1,7 +1,6 @@
 import 'package:bus_tracker_aw/general.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 
 import '../login.dart';
 import 'map.dart';
@@ -15,6 +14,7 @@ class NavPage extends StatefulWidget {
 
 class _NavPageState extends State<NavPage> {
   int _selectedIndex = 0;
+  String userFullName = "";
   static final List<Widget> _widgetOptions = <Widget>[
     const MapPage(),
     SchedulePage(),
@@ -28,59 +28,85 @@ class _NavPageState extends State<NavPage> {
   }
 
   @override
+  void initState() {
+    setName();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leadingWidth: 100,
-        leading: Align(
-          alignment: Alignment.center,
-          child: Text(
-            '\u{1F44B} ',
-            style: const TextStyle(color: Colors.grey, fontSize: 21),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.logout_rounded,
-              color: Colors.grey,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          primary: false,
+          centerTitle: false,
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          flexibleSpace: Container(
+            alignment: Alignment.centerLeft,
+            margin: const EdgeInsets.only(left: 15),
+            child: Text(
+              "\u{1F44B} $userFullName",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 18,
+              ),
+              textAlign: TextAlign.end,
             ),
-            onPressed: () {
-              print(CurrentSession.session.$id);
-              CurrentSession.account
-                  .deleteSession(sessionId: CurrentSession.session.$id);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
-            },
-          )
-        ],
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Map',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.schedule),
-            label: 'Schedule',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.logout_rounded,
+                color: Colors.grey,
+              ),
+              onPressed: () async{
+                await CurrentSession.account
+                    .deleteSession(sessionId: CurrentSession.session.$id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              },
+            )
+          ],
+        ),
+        body: Center(
+          child: _widgetOptions.elementAt(_selectedIndex),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.map),
+              label: 'Map',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.schedule),
+              label: 'Schedule',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.amber[800],
+          onTap: _onItemTapped,
+        ),
       ),
     );
+  }
+
+  Future<void> setName() async {
+    await CurrentSession.account.get().then((value) {
+      setState(() {
+        userFullName = value.name;
+      });
+      if (kDebugMode) {
+        print(value.name);
+      }
+    });
   }
 }

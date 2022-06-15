@@ -16,15 +16,19 @@ dependencies:
     git:
       url: git://github.com/mpinkard/map_controller.git
 
-  appwrite: ^3.0.1
-  location: ^4.3.0
+  appwrite: ^5.0.0
+  location: ^4.4.0
   latlong2: ^0.8.1
-
+  url_launcher: ^6.1.2
+  sliding_up_panel: ^2.0.0+1
+  flutter_switch: ^0.3.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^1.0.0
+
 flutter:
 
   uses-material-design: true

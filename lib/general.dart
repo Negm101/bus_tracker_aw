@@ -5,4 +5,7 @@ class CurrentSession {
   static Client client = Client();
   static late Account account;
   static late Session session;
+  
+
+  
 }

@@ -13,48 +13,48 @@ String busToJson(Bus data) => json.encode(data.toJson());
 
 class Bus {
   Bus({
-    this.plateNumber,
-    this.latitude,
-    this.longitude,
+    this.driverId,
+    this.locationId,
     this.isActive,
+    this.plateNumber,
+    this.busColor,
+    this.city,
     this.id,
-    this.internalId,
-    this.read,
-    this.write,
     this.collection,
+    List<String>? busStops,
   });
 
-  String? plateNumber;
-  double? latitude;
-  double? longitude;
+  String? driverId;
+  String? locationId;
   bool? isActive;
+  String? plateNumber;
+  String? busColor;
+  String? city;
   String? id;
-  String? internalId;
-  List<String>? read;
-  List<String>? write;
   String? collection;
+  List<String>? busStops;
 
   factory Bus.fromJson(Map<String, dynamic> json) => Bus(
-        plateNumber: json["plateNumber"],
-        latitude: json["latitude"].toDouble(),
-        longitude: json["longitude"].toDouble(),
+        driverId: json["driverId"],
+        locationId: json["locationId"],
         isActive: json["isActive"],
+        plateNumber: json["plateNumber"],
+        busColor: json["busColor"],
+        city: json['city'],
+        busStops: List<String>.from(json["busStops"].map((x) => x)),
         id: json["\u0024id"],
-        internalId: json["\u0024internalId"],
-        read: List<String>.from(json["\u0024read"].map((x) => x)),
-        write: List<String>.from(json["\u0024write"].map((x) => x)),
         collection: json["\u0024collection"],
       );
 
   Map<String, dynamic> toJson() => {
-        "plateNumber": plateNumber,
-        "latitude": latitude,
-        "longitude": longitude,
+        "driverId": driverId,
+        "locationId": locationId,
         "isActive": isActive,
+        "plateNumber": plateNumber,
+        "busStops": busStops == null
+            ? null
+            : List<dynamic>.from(busStops!.map((x) => x)),
         "\u0024id": id,
-        "\u0024internalId": internalId,
-        //"\u0024read": List<String>.from(read?.map((x) => x)),
-        //"\u0024write": List<String>.from(write.map((x) => x)),
         "\u0024collection": collection,
       };
 }
