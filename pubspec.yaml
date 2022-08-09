@@ -11,10 +11,8 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  flutter_map: ^0.14.0
-  map_controller: 
-    git:
-      url: git://github.com/mpinkard/map_controller.git
+  flutter_map: ^1.1.0
+  flutter_map_location_marker: ^4.0.0
 
   appwrite: ^5.0.0
   location: ^4.4.0
@@ -22,15 +20,31 @@ dependencies:
   url_launcher: ^6.1.2
   sliding_up_panel: ^2.0.0+1
   flutter_switch: ^0.3.2
+  flutter_svg: ^1.1.0
+  badges: ^2.0.3
+
+  firebase_core: ^1.19.1
+  cloud_firestore: ^3.2.1
+  firebase_messaging: ^11.4.4
+  pull_to_refresh: ^2.0.0
+  flutter_quill: ^5.0.3
+  
   
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^1.0.0
+  flutter_launcher_icons: ^0.9.3
 
 flutter:
 
   uses-material-design: true
   assets:
     - assets/cyberjaya-1.geojson
+    - assets/svgs/
+  
+  fonts:
+    - family:  TransportationIcons
+      fonts:
+       - asset: assets/fonts/TransportationIcons.ttf

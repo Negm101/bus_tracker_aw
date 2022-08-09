@@ -44,7 +44,7 @@ class BusLocation {
         accuracy: json["accuracy"].toDouble(),
         altitude: json["altitude"].toDouble(),
         speed: json["speed"].toDouble(),
-        speedAccuracy: json["speedAccuracy"],
+        speedAccuracy: json["speedAccuracy"].toDouble(),
         heading: json["heading"].toDouble(),
         time: json["time"].toDouble(),
         isMock: json["isMock"],

@@ -1,9 +1,8 @@
-import 'package:bus_tracker_aw/screens/driver/mapd.dart';
 import 'package:flutter/material.dart';
-
 import 'screens/login.dart';
 
-void main() {
+
+void main() async {
   runApp(const MMUBusTracker());
 }
 

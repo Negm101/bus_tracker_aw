@@ -5,6 +5,7 @@
 import 'dart:convert';
 
 import 'package:appwrite/models.dart';
+import 'package:latlong2/latlong.dart';
 
 Bus busFromJson(String str) => Bus.fromJson(json.decode(str));
 List<Bus> busesfromJson(DocumentList _list) =>
@@ -18,6 +19,7 @@ class Bus {
     this.isActive,
     this.plateNumber,
     this.busColor,
+    this.routes,
     this.city,
     this.id,
     this.collection,
@@ -29,22 +31,31 @@ class Bus {
   bool? isActive;
   String? plateNumber;
   String? busColor;
+  List<LatLng>? routes;
   String? city;
   String? id;
   String? collection;
   List<String>? busStops;
 
-  factory Bus.fromJson(Map<String, dynamic> json) => Bus(
+  factory Bus.fromJson(Map<String, dynamic> json) { 
+    List<LatLng> latLngs = [];
+    for (int i = 0; i < json["routes"].length; i++) {
+      latLngs.add(LatLng(
+          double.parse(json["routes"][i].replaceAll("\"", "").split(',')[0]),
+          double.parse(json["routes"][i].replaceAll("\"", "").split(',')[1])));
+    }
+    return Bus(
         driverId: json["driverId"],
         locationId: json["locationId"],
         isActive: json["isActive"],
         plateNumber: json["plateNumber"],
         busColor: json["busColor"],
+        routes: latLngs,
         city: json['city'],
         busStops: List<String>.from(json["busStops"].map((x) => x)),
         id: json["\u0024id"],
         collection: json["\u0024collection"],
-      );
+      );}
 
   Map<String, dynamic> toJson() => {
         "driverId": driverId,

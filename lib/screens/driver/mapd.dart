@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:bus_tracker_aw/helpers/transportation_icons_icons.dart';
 import 'package:bus_tracker_aw/models/reports.dart';
 import 'package:bus_tracker_aw/models/user.dart';
 import 'package:flutter/foundation.dart';
@@ -12,12 +12,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 
 import '../../general.dart';
-import 'package:flutter_switch/flutter_switch.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../models/bus-stops.dart';
 import '../login.dart';
 
 class MapDriverPage extends StatefulWidget {
@@ -29,9 +31,12 @@ class _MapDriverPageState extends State<MapDriverPage> {
   LatLng mapCenter = LatLng(2.9252, 101.6376);
   late MapController _mapController;
   LatLng pointer = LatLng(2.9252, 101.6376);
-  List<Marker> markers = [];
+  List<Marker> driverLocMarker = [];
+  List<Marker> busStopsMarkers = [];
+  List<Polyline> polylines = [];
   late Database database;
 
+  //late LocationData locationData;
   Bus? _driverBus;
   bool _isRideActive = false;
   Location location = Location();
@@ -45,10 +50,9 @@ class _MapDriverPageState extends State<MapDriverPage> {
   void initState() {
     setName();
     initLocServ();
-    location.changeSettings(interval: 10000, accuracy: LocationAccuracy.high);
     location.enableBackgroundMode(enable: true);
     database = Database(CurrentSession.client);
-    _setBus();
+    _loadBusStops();
     _mapController = MapController();
     super.initState();
   }
@@ -74,18 +78,10 @@ class _MapDriverPageState extends State<MapDriverPage> {
                       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                   subdomains: ['a', 'b', 'c'],
                 ),
+                PolylineLayerOptions(polylines: polylines),
+                MarkerLayerOptions(markers: busStopsMarkers),
                 MarkerLayerOptions(
-                  markers: [
-                    Marker(
-                        width: 80.0,
-                        height: 80.0,
-                        point: pointer,
-                        builder: (ctx) => const Icon(
-                              Icons.circle,
-                              color: Colors.redAccent,
-                              size: 16,
-                            )),
-                  ],
+                  markers: driverLocMarker,
                 ),
               ],
             ),
@@ -100,8 +96,7 @@ class _MapDriverPageState extends State<MapDriverPage> {
                         alignment: Alignment.centerLeft,
                         margin: const EdgeInsets.only(left: 10),
                         child: FutureBuilder(
-                          future:
-                              _getAvatar(), //works for both public file and private file, for private files you need to be logged in
+                          future: _getAvatar(),
                           builder: (context, snapshot) {
                             return GestureDetector(
                               onTap: () {},
@@ -170,7 +165,11 @@ class _MapDriverPageState extends State<MapDriverPage> {
                           mini: true,
                           backgroundColor: Colors.white,
                           onPressed: () {
-                            _showReportDialog();
+                            if (!_isRideActive) {
+                              showSnackBar("Start you ride first");
+                            } else {
+                              _showReportDialog();
+                            }
                           },
                           child: GestureDetector(
                             onLongPress: () {
@@ -226,9 +225,7 @@ class _MapDriverPageState extends State<MapDriverPage> {
                         FloatingActionButton(
                           mini: true,
                           backgroundColor: Colors.white,
-                          onPressed: () {
-                            _mapController.move(pointer, 15);
-                          },
+                          onPressed: () {},
                           child: const Icon(
                             Icons.gps_fixed,
                             color: Colors.blueAccent,
@@ -280,41 +277,52 @@ class _MapDriverPageState extends State<MapDriverPage> {
   }
 
   void _startRide() async {
+    await location.changeSettings(
+        interval: 5000, accuracy: LocationAccuracy.high);
     await database.updateDocument(
         collectionId: 'buses',
         documentId: _driverBus!.id!,
         data: {"isActive": true});
     locationSubscription =
         location.onLocationChanged.listen((LocationData locationData) {
-      setState(() {
-        pointer = LatLng(locationData.latitude!, locationData.longitude!);
-        Future result = database.updateDocument(
-            collectionId: "busLoca",
-            documentId: _driverBus!.locationId!,
-            data: {
-              "latitude": locationData.latitude,
-              "longitude": locationData.longitude,
-              "accuracy": locationData.accuracy,
-              "altitude": locationData.altitude,
-              "speed": locationData.speed,
-              "speedAccuracy": locationData.speedAccuracy,
-              "heading": locationData.heading,
-              "time": locationData.time,
-              "isMock": locationData.isMock
-            });
-        result.then((response) {
-          setState(() {
-            _isRideActive = true;
+      driverLocMarker.clear();
+      driverLocMarker.add(
+        Marker(
+          height: 36,
+          point: LatLng(locationData.latitude!, locationData.longitude!),
+          builder: (ctx) => const Icon(
+            Icons.circle,
+            color: Colors.blueAccent,
+          ),
+        ),
+      );
+
+      Future result = database.updateDocument(
+          collectionId: "busLoca",
+          documentId: _driverBus!.locationId!,
+          data: {
+            "latitude": locationData.latitude,
+            "longitude": locationData.longitude,
+            "accuracy": locationData.accuracy,
+            "altitude": locationData.altitude,
+            "speed": locationData.speed,
+            "speedAccuracy": locationData.speedAccuracy,
+            "heading": locationData.heading,
+            "time": locationData.time,
+            "isMock": locationData.isMock
           });
-          if (kDebugMode) {
-            print("location updated");
-          }
-        }).catchError((error) {
-          _stopRide();
-          if (kDebugMode) {
-            print(error.response);
-          }
+      result.then((response) {
+        setState(() {
+          _isRideActive = true;
         });
+        if (kDebugMode) {
+          print("location updated");
+        }
+      }).catchError((error) {
+        _stopRide();
+        if (kDebugMode) {
+          print(error.response);
+        }
       });
     });
   }
@@ -654,6 +662,98 @@ class _MapDriverPageState extends State<MapDriverPage> {
     Avatars avatars = Avatars(CurrentSession.client);
     Future result = avatars.getInitials(background: "9e9e9e", color: "ffffff");
     return result;
+  }
+
+  void showSnackBar(String message, {VoidCallback? onPressed, String? label}) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      elevation: 8,
+      margin: const EdgeInsets.only(bottom: 100, right: 20, left: 20),
+      backgroundColor: Colors.white,
+      dismissDirection: DismissDirection.startToEnd,
+      behavior: SnackBarBehavior.floating,
+      content: Row(
+        children: [
+          const Icon(
+            Icons.error_rounded,
+            color: Colors.red,
+          ),
+          Text(
+            "  $message",
+            style: const TextStyle(color: Colors.black),
+          )
+        ],
+      ),
+      action: SnackBarAction(
+        label: label ?? "Dismiss",
+        onPressed: onPressed ?? () {},
+      ),
+    ));
+  }
+
+  Future<void> _loadBusStops() async {
+    await _setBus();
+    busStopsMarkers.clear();
+    List<BusStop> busStops;
+    DocumentList _docList;
+    Future result = database.listDocuments(
+        collectionId: 'busStops',
+        queries: [Query.equal('busId', _driverBus!.id)]);
+
+    result.then((response) {
+      _docList = response as DocumentList;
+      busStops = busStopFromJson(_docList);
+      setState(() {
+        for (var i = 0; i < busStops.length; i++) {
+          print(busStops[i].name! +
+              ": (" +
+              busStops[i].latitude!.toString() +
+              ", " +
+              busStops[i].longitude!.toString());
+          busStopsMarkers.add(
+            Marker(
+                width: 100.0,
+                height: 80.0,
+                point: LatLng(busStops[i].latitude!, busStops[i].longitude!),
+                rotate: true,
+                rotateAlignment: Alignment.bottomCenter,
+                anchorPos: AnchorPos.align(AnchorAlign.top),
+                builder: (ctx) => Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            margin: const EdgeInsets.only(bottom: 5),
+                            decoration: const BoxDecoration(
+                                color: Colors.deepPurple,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5))),
+                            child: Text(
+                              busStops[i].name!,
+                              style: const TextStyle(color: Colors.white),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
+                        const Icon(
+                          TransportationIcons.bus_stop_1,
+                          size: 32,
+                          color: Colors.deepPurple,
+                        ),
+                      ],
+                    )),
+          );
+        }
+        polylines.clear();
+        polylines.add(Polyline(
+            points: _driverBus!.routes!,
+            strokeWidth: 4,
+            color: Colors.purpleAccent));
+      });
+    }).catchError((error) {
+      if (kDebugMode) {
+        print(error);
+      }
+    });
   }
 }
 /*

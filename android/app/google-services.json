@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "444575432422",
+    "project_id": "mmu-bus-tracker-announcements",
+    "storage_bucket": "mmu-bus-tracker-announcements.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444575432422:android:8cfa2eb150a8ea03dd8527",
+        "android_client_info": {
+          "package_name": "com.example.bus_tracker_aw"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444575432422-b7uu19253v4jhmo5h0lcr19dman3dh02.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtTvX80Gz76B9XuSZf0MJsCj2nO674Xf4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444575432422-b7uu19253v4jhmo5h0lcr19dman3dh02.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
