@@ -1,16 +1,8 @@
-# bus_tracker_aw
+# University Bus Tracker
 
-A new Flutter project.
+The app allows university students and staff to track the exact location of a bus in real time.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- View buses in real time on the map 
+- View specific routes and associated stops 
+- View your present location if GPS is enabled 
+- View the most recent announcements regarding the bus system, such as delays and rerouting
